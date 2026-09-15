@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>OWL LiFE Catch'em all!</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background: #222;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    overflow: hidden;
+}
+
+
+/* =========================================
+   SCORE
+========================================= */
+
+#scoreBoard {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    z-index: 100;
+
+    padding: 8px 20px;
+
+    background: rgba(0,0,0,0.7);
+
+    border: 2px solid white;
+    border-radius: 10px;
+
+    font-size: 24px;
+    font-weight: bold;
+}
+
+
+/* =========================================
+   LEVEL UP BAR
+========================================= */
+
+#levelBarContainer {
+    position: absolute;
+
+    top: 68px;
+    right: 20px;
+
+    width: 220px;
+    height: 28px;
+
+    z-index: 100;
+
+    background: rgba(0,0,0,0.7);
+
+    border: 2px solid white;
+    border-radius: 14px;
+
+    overflow: hidden;
+}
+
+#levelBar {
+    width: 0%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #00ff66,
+            #ffff00,
+            #ff9900
+        );
+
+    border-radius: 10px;
+
+    transition: width 0.2s ease-out;
+}
+
+#levelBarText {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    color: white;
+
+    text-shadow: 1px 1px 2px black;
+}
+
+
+/* =========================================
+   GAME AREA
+========================================= */
+
+#game {
+    position: relative;
+
+    width: 100vw;
+    height: 75vh;
+
+    min-height: 400px;
+
+    overflow: hidden;
+
+    background-image:
+        url("images/bg01.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    transition: background-image 0.5s ease;
+
+    border-top: 4px solid #111;
+    border-bottom: 4px solid #111;
+}
+
+
+/* =========================================
+   CHARACTER WRAPPER
+========================================= */
+
+#characterWrapper {
+    position: absolute;
+
+    width: 320px;
+    height: 320px;
+
+    left: 100px;
+    bottom: 0;
+
+    transform-origin: bottom center;
+
+    transform: scale(1);
+
+    transition: transform 0.08s linear;
+
+    z-index: 20;
+}
+
+
+/* =========================================
+   CHARACTER
+========================================= */
+
+#character {
+    display: block;
+
+    width: 320px;
+    height: 320px;
+
+    object-fit: contain;
+
+    max-width: none;
+
+    user-select: none;
+    -webkit-user-drag: none;
+
+    transform: scaleX(1);
+
+    transition: transform 0.05s linear;
+}
+
+
+/* =========================================
+   OBJECT B — BUG
+========================================= */
+
+#objectB {
+    position: absolute;
+
+    width: 80px;
+    height: 80px;
+
+    object-fit: contain;
+
+    left: -100px;
+    bottom: 200px;
+
+    user-select: none;
+    -webkit-user-drag: none;
+
+    z-index: 10;
+}
+
+
+/* =========================================
+   OBJECT C
+========================================= */
+
+#objectC {
+    position: absolute;
+
+    width: 80px;
+    height: 80px;
+
+    object-fit: contain;
+
+    left: -100px;
+    top: -100px;
+
+    user-select: none;
+    -webkit-user-drag: none;
+
+    z-index: 15;
+
+    display: none;
+}
+
+
+/* =========================================
+   INSTRUCTIONS
+========================================= */
+
+#instructions {
+    padding: 10px;
+    font-size: 16px;
+}
+
+
+/* =========================================
+   MOBILE CONTROLS
+========================================= */
+
+#mobileControls {
+    position: fixed;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 100px;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 7px;
+
+    background: rgba(0, 0, 0, 0.90);
+
+    border-top: 2px solid #555;
+
+    z-index: 500;
+
+    touch-action: none;
+}
+
+
+/* =========================================
+   CONTROL BUTTONS
+========================================= */
+
+.controlButton {
+    width: 58px;
+    height: 58px;
+
+    padding: 0;
+
+    border: 2px solid white;
+    border-radius: 12px;
+
+    background: #333;
+    color: white;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 24px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+
+    touch-action: none;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 0 #111;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* =========================================
+   BUTTON PRESSED
+========================================= */
+
+.controlButton.active {
+    background: #0099dd;
+
+    transform: translateY(4px);
+
+    box-shadow: 0 0 0 #111;
+}
+
+
+/* =========================================
+   SPECIAL BUTTON COLORS
+========================================= */
+
+.controlButton.run {
+    background: #a05a00;
+}
+
+.controlButton.run.active {
+    background: #d77a00;
+}
+
+.controlButton.jump {
+    background: #087f23;
+}
+
+.controlButton.jump.active {
+    background: #0aaa32;
+}
+
+.controlButton.fly {
+    background: #7040a0;
+}
+
+.controlButton.fly.active {
+    background: #9657d0;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+#footer {
+    position: fixed;
+
+    bottom: 3px;
+    left: 0;
+
+    width: 100%;
+
+    text-align: center;
+
+    font-size: 11px;
+
+    color: rgba(255,255,255,0.65);
+
+    z-index: 200;
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   PHONE LAYOUT
+========================================= */
+
+@media (max-width: 768px) {
+
+    #mobileControls {
+        display: flex;
+    }
+
+    #game {
+        height: calc(75vh - 100px);
+        min-height: 280px;
+    }
+
+    #instructions {
+        display: none;
+    }
+
+    h1 {
+        font-size: 24px;
+        margin: 8px 0;
+    }
+
+    body > p {
+        font-size: 12px;
+        margin: 5px;
+    }
+
+    #scoreBoard {
+        top: 5px;
+        right: 8px;
+
+        padding: 5px 10px;
+
+        font-size: 18px;
+    }
+
+    #levelBarContainer {
+        top: 48px;
+        right: 8px;
+
+        width: 170px;
+        height: 22px;
+    }
+
+    #levelBarText {
+        font-size: 11px;
+    }
+
+    #footer {
+        display: none;
+    }
+}
+
+
+/* =========================================
+   SMALL PHONES
+========================================= */
+
+@media (max-width: 400px) {
+
+    #mobileControls {
+        gap: 4px;
+        padding: 5px;
+    }
+
+    .controlButton {
+        width: 47px;
+        height: 52px;
+
+        border-radius: 10px;
+
+        font-size: 19px;
+    }
+
+    .controlButton.action {
+        font-size: 10px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- =======================================
+     SCORE
+======================================= -->
+
+<div id="scoreBoard">
+    Score: <span id="score">0</span>
+</div>
+
+<!-- =======================================
+     LEVEL BAR
+======================================= -->
+
+<div id="levelBarContainer">
+
+
+    <div id="levelBar"></div>
+
+<div id="levelBarText">
+    Level Up: 0%
+</div>
+
+
+</div>
+
+<h1>OWL LiFE Catch'em all!</h1>
+
+<p>
+    Arrow Keys • Shift + Arrow • Space = Jump • F = Fly
+</p>
+
+<!-- =======================================
+     GAME AREA
+======================================= -->
+
+<div id="game">
+
+```
+<!-- ===================================
+     CHARACTER
+==================================== -->
+
+<div id="characterWrapper">
+
+    <img
+        id="character"
+        src="images/pause.gif"
+        width="320"
+        height="320"
+        alt="Character"
+    >
+
+</div>
+
+
+<!-- ===================================
+     OBJECT B — BUG
+==================================== -->
+
+<img
+    id="objectB"
+    src="images/bug.gif"
+    width="80"
+    height="80"
+    alt="Bug"
+>
+
+
+<!-- ===================================
+     OBJECT C
+==================================== -->
+
+<img
+    id="objectC"
+    src="images/objectC.gif"
+    width="80"
+    height="80"
+    alt="Falling object"
+>
+```
+
+</div>
+
+<!-- =======================================
+     INSTRUCTIONS
+======================================= -->
+
+<div id="instructions">
+
+```
+← → Walk |
+Shift + ←/→ Run |
+↑ Background |
+↓ Foreground |
+F Fly |
+Space Jump
+```
+
+</div>
+
+<!-- =======================================
+     MOBILE CONTROLS
+======================================= -->
+
+<div id="mobileControls">
+
+
+<button
+    type="button"
+    class="controlButton"
+    id="btnLeft"
+    aria-label="Move left">
+    ◀
+</button>
+
+<button
+    type="button"
+    class="controlButton"
+    id="btnRight"
+    aria-label="Move right">
+    ▶
+</button>
+
+<button
+    type="button"
+    class="controlButton"
+    id="btnUp"
+    aria-label="Move background">
+    ▲
+</button>
+
+<button
+    type="button"
+    class="controlButton"
+    id="btnDown"
+    aria-label="Move foreground">
+    ▼
+</button>
+
+<button
+    type="button"
+    class="controlButton run"
+    id="btnRun"
+    aria-label="Run">
+    RUN
+</button>
+
+<button
+    type="button"
+    class="controlButton jump"
+    id="btnJump"
+    aria-label="Jump">
+    JMP
+</button>
+
+<button
+    type="button"
+    class="controlButton fly"
+    id="btnFly"
+    aria-label="Fly">
+    FLY
+</button>
+
+
+</div>
+
+<!-- =======================================
+     FOOTER
+======================================= -->
+
+<div id="footer">
+    Game by Jasonesq.
+</div>
+
+<!-- =======================================
+     SOUNDS
+======================================= -->
+
+<audio
+ id="blipSound"
+ src="sound/blip.mp3"
+ preload="auto"> </audio>
+
+<audio
+ id="hitSound"
+ src="images/hit.mp3"
+ preload="auto"> </audio>
+
+<script>
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const game =
+    document.getElementById("game");
+
+const characterWrapper =
+    document.getElementById("characterWrapper");
+
+const character =
+    document.getElementById("character");
+
+const objectB =
+    document.getElementById("objectB");
+
+const objectC =
+    document.getElementById("objectC");
+
+const scoreDisplay =
+    document.getElementById("score");
+
+const levelBar =
+    document.getElementById("levelBar");
+
+const levelBarText =
+    document.getElementById("levelBarText");
+
+const blipSound =
+    document.getElementById("blipSound");
+
+const hitSound =
+    document.getElementById("hitSound");
+
+
+/* =========================================
+   CHARACTER POSITION
+========================================= */
+
+let x = 100;
+
+let jumpY = 0;
+
+let depth = 0;
+
+
+/* =========================================
+   CHARACTER SIZE
+========================================= */
+
+const fullSize = 320;
+
+const minimumScale = 0.25;
+
+let characterScale = 1;
+
+
+/* =========================================
+   CHARACTER DIRECTION
+========================================= */
+
+let facingRight = false;
+
+
+/* =========================================
+   MOVEMENT SPEED
+========================================= */
+
+const walkSpeed = 4;
+
+const runSpeed = 9;
+
+const depthWalkSpeed = 0.012;
+
+const depthRunSpeed = 0.025;
+
+const flyWalkSpeed = 5;
+
+const flyRunSpeed = 10;
+
+
+/* =========================================
+   KEY STATES
+========================================= */
+
+let leftPressed = false;
+
+let rightPressed = false;
+
+let upPressed = false;
+
+let downPressed = false;
+
+let shiftPressed = false;
+
+let flying = false;
+
+
+/* =========================================
+   JUMP
+========================================= */
+
+let jumping = false;
+
+let verticalVelocity = 0;
+
+const gravity = 0.7;
+
+const jumpPower = 15;
+
+
+/* =========================================
+   EAT
+========================================= */
+
+let eating = false;
+
+const eatDuration = 500;
+
+
+/* =========================================
+   SCORE
+========================================= */
+
+let score = 0;
+
+
+/* =========================================
+   BACKGROUND SETTINGS
+========================================= */
+
+const backgroundChangeScore = 30;
+
+const totalBackgrounds = 10;
+
+let currentBackground = 1;
+
+
+/* =========================================
+   LEVEL BAR
+========================================= */
+
+function updateLevelBar() {
+
+    const levelScore =
+        score % backgroundChangeScore;
+
+    let percentage =
+        (levelScore / backgroundChangeScore) * 100;
+
+    percentage =
+        Math.max(
+            0,
+            Math.min(100, percentage)
+        );
+
+    levelBar.style.width =
+        percentage + "%";
+
+    levelBarText.textContent =
+        "Level Up: " +
+        Math.round(percentage) +
+        "%";
+}
+
+
+/* =========================================
+   BUG SPEED SETTINGS
+========================================= */
+
+const bugSpeedInterval = 10;
+
+const bugSpeedIncrease = 0.5;
+
+
+/* =========================================
+   IMAGES
+========================================= */
+
+const images = {
+
+    walk: "images/walk.gif",
+
+    run: "images/run.gif",
+
+    pause: "images/pause.gif",
+
+    jump: "images/jump.gif",
+
+    up: "images/up.gif",
+
+    down: "images/down.gif",
+
+    fly: "images/fly.gif",
+
+    eat: "images/eat.gif"
+
+};
+
+
+/* =========================================
+   CURRENT ANIMATION
+========================================= */
+
+let currentAnimation = "pause";
+
+
+/* =========================================
+   CHARACTER DIRECTION
+========================================= */
+
+function updateCharacterDirection() {
+
+    if (facingRight) {
+
+        character.style.transform =
+            "scaleX(-1)";
+
+    } else {
+
+        character.style.transform =
+            "scaleX(1)";
+    }
+}
+
+
+/* =========================================
+   CHANGE GIF
+========================================= */
+
+function setAnimation(animation) {
+
+    if (currentAnimation === animation) {
+
+        return;
+    }
+
+    currentAnimation = animation;
+
+    character.src =
+        images[animation];
+
+    updateCharacterDirection();
+}
+
+
+/* =========================================
+   CHANGE BACKGROUND
+========================================= */
+
+function updateBackground() {
+
+    let backgroundNumber =
+        Math.floor(
+            score / backgroundChangeScore
+        ) + 1;
+
+    backgroundNumber =
+        Math.min(
+            totalBackgrounds,
+            backgroundNumber
+        );
+
+    if (
+        backgroundNumber ===
+        currentBackground
+    ) {
+
+        return;
+    }
+
+    currentBackground =
+        backgroundNumber;
+
+    const backgroundFile =
+        String(backgroundNumber)
+        .padStart(2, "0");
+
+    game.style.backgroundImage =
+        `url("images/bg${backgroundFile}.jpg")`;
+
+    updateLevelBar();
+}
+
+
+/* =========================================
+   PLAY BLIP
+========================================= */
+
+function playBlip() {
+
+    try {
+
+        blipSound.currentTime = 0;
+
+        const playPromise =
+            blipSound.play();
+
+        if (playPromise !== undefined) {
+
+            playPromise.catch(function() {
+
+                /* Sound unavailable. */
+
+            });
+        }
+
+    } catch (error) {
+
+        /* Keep game running. */
+
+    }
+}
+
+
+/* =========================================
+   PLAY HIT SOUND
+========================================= */
+
+function playHitSound() {
+
+    try {
+
+        hitSound.currentTime = 0;
+
+        const playPromise =
+            hitSound.play();
+
+        if (playPromise !== undefined) {
+
+            playPromise.catch(function() {
+
+                /* Sound unavailable. */
+
+            });
+        }
+
+    } catch (error) {
+
+        /* Keep game running. */
+
+    }
+}
+
+
+/* =========================================
+   SCALE CHARACTER
+========================================= */
+
+function setCharacterScale(scale) {
+
+    scale = Math.max(
+        minimumScale,
+        Math.min(1, scale)
+    );
+
+    characterScale = scale;
+
+    characterWrapper.style.transform =
+        `scale(${scale})`;
+}
+
+
+/* =========================================
+   DEPTH SCALE
+========================================= */
+
+function updateDepthSize() {
+
+    const scale =
+        1 - (depth * 0.75);
+
+    setCharacterScale(scale);
+}
+
+
+/* =========================================
+   DEPTH POSITION
+========================================= */
+
+function updateDepthPosition() {
+
+    const maxDepthY =
+        game.clientHeight * (2 / 3);
+
+    const depthY =
+        depth * maxDepthY;
+
+    characterWrapper.style.bottom =
+        (depthY + jumpY) + "px";
+
+    characterWrapper.style.left =
+        x + "px";
+}
+
+
+/* =========================================
+   UPDATE ANIMATION
+========================================= */
+
+function updateMovementImage() {
+
+    if (eating) {
+
+        setAnimation("eat");
+
+        return;
+    }
+
+    if (flying) {
+
+        setAnimation("fly");
+
+        return;
+    }
+
+    if (jumping) {
+
+        setAnimation("jump");
+
+        return;
+    }
+
+    if (upPressed) {
+
+        setAnimation("up");
+
+        return;
+    }
+
+    if (downPressed) {
+
+        setAnimation("down");
+
+        return;
+    }
+
+    if (
+        shiftPressed &&
+        (leftPressed || rightPressed)
+    ) {
+
+        setAnimation("run");
+
+        return;
+    }
+
+    if (
+        leftPressed ||
+        rightPressed
+    ) {
+
+        setAnimation("walk");
+
+        return;
+    }
+
+    setAnimation("pause");
+}
+
+
+/* =========================================
+   MOVE BACKGROUND
+========================================= */
+
+function moveBackground() {
+
+    const speed =
+        shiftPressed
+            ? depthRunSpeed
+            : depthWalkSpeed;
+
+    depth += speed;
+
+    if (depth > 1) {
+
+        depth = 1;
+    }
+
+    updateDepthSize();
+
+    updateDepthPosition();
+
+    if (
+        !eating &&
+        !flying &&
+        !jumping
+    ) {
+
+        setAnimation("up");
+    }
+}
+
+
+/* =========================================
+   MOVE FOREGROUND
+========================================= */
+
+function moveForeground() {
+
+    const speed =
+        shiftPressed
+            ? depthRunSpeed
+            : depthWalkSpeed;
+
+    depth -= speed;
+
+    if (depth < 0) {
+
+        depth = 0;
+    }
+
+    updateDepthSize();
+
+    updateDepthPosition();
+
+    if (
+        !eating &&
+        !flying &&
+        !jumping
+    ) {
+
+        setAnimation("down");
+    }
+
+    if (depth === 0) {
+
+        setCharacterScale(1);
+    }
+}
+
+
+/* =========================================
+   FLYING
+========================================= */
+
+function moveFlying() {
+
+    const speed =
+        shiftPressed
+            ? flyRunSpeed
+            : flyWalkSpeed;
+
+    if (leftPressed) {
+
+        x -= speed;
+    }
+
+    if (rightPressed) {
+
+        x += speed;
+    }
+
+    if (upPressed) {
+
+        jumpY += speed;
+    }
+
+    if (downPressed) {
+
+        jumpY -= speed;
+    }
+
+    const maxY =
+        game.clientHeight - fullSize;
+
+    if (jumpY < 0) {
+
+        jumpY = 0;
+    }
+
+    if (jumpY > maxY) {
+
+        jumpY = maxY;
+    }
+
+    setCharacterScale(1);
+
+    characterWrapper.style.left =
+        x + "px";
+
+    characterWrapper.style.bottom =
+        jumpY + "px";
+
+    if (!eating) {
+
+        setAnimation("fly");
+    }
+}
+
+
+/* =========================================
+   CHARACTER BOUNDARIES
+========================================= */
+
+function keepCharacterOnScreen() {
+
+    const visualWidth =
+        fullSize * characterScale;
+
+    const maxX =
+        game.clientWidth - visualWidth;
+
+    if (x < 0) {
+
+        x = 0;
+    }
+
+    if (x > maxX) {
+
+        x = maxX;
+    }
+}
+
+
+/* =========================================
+   JUMP
+========================================= */
+
+function updateJump() {
+
+    if (flying || !jumping) {
+
+        return;
+    }
+
+    jumpY += verticalVelocity;
+
+    verticalVelocity -= gravity;
+
+    if (jumpY <= 0) {
+
+        jumpY = 0;
+
+        jumping = false;
+
+        verticalVelocity = 0;
+
+        updateMovementImage();
+    }
+
+    updateDepthPosition();
+}
+
+
+/* =========================================
+   BUG
+========================================= */
+
+let bugX = -100;
+
+let bugY = 200;
+
+let bugSpeed = 2.5;
+
+let bugDirection = 1;
+
+
+/* =========================================
+   RESET BUG
+========================================= */
+
+function resetBug() {
+
+    const fromLeft =
+        Math.random() < 0.5;
+
+    if (fromLeft) {
+
+        bugX = -100;
+
+        bugDirection = 1;
+
+    } else {
+
+        bugX =
+            game.clientWidth + 100;
+
+        bugDirection = -1;
+    }
+
+    bugY =
+        50 +
+        Math.random() *
+        Math.max(
+            100,
+            game.clientHeight - 150
+        );
+
+    const randomSpeed =
+        2 +
+        Math.random() * 3;
+
+    const scoreSpeed =
+        Math.floor(
+            score / bugSpeedInterval
+        ) * bugSpeedIncrease;
+
+    bugSpeed =
+        randomSpeed +
+        scoreSpeed;
+}
+
+
+/* =========================================
+   BUG MOVEMENT
+========================================= */
+
+function updateBug() {
+
+    bugX +=
+        bugSpeed *
+        bugDirection;
+
+    bugY +=
+        Math.sin(
+            Date.now() / 250
+        ) * 0.7;
+
+    objectB.style.left =
+        bugX + "px";
+
+    objectB.style.bottom =
+        bugY + "px";
+
+    if (
+        bugX >
+        game.clientWidth + 120 ||
+
+        bugX < -120
+    ) {
+
+        resetBug();
+    }
+}
+
+
+/* =========================================
+   OBJECT C
+========================================= */
+
+let objectCX = 0;
+
+let objectCY = -100;
+
+let objectCSpeed = 4;
+
+let objectCActive = false;
+
+const objectCMinDelay = 7000;
+
+const objectCMaxDelay = 12000;
+
+
+/* =========================================
+   START OBJECT C TIMER
+========================================= */
+
+function scheduleObjectC() {
+
+    if (score < 30) {
+
+        return;
+    }
+
+    if (objectCActive) {
+
+        return;
+    }
+
+    const delay =
+        objectCMinDelay +
+        Math.random() *
+        (
+            objectCMaxDelay -
+            objectCMinDelay
+        );
+
+    setTimeout(function() {
+
+        if (score >= 30) {
+
+            launchObjectC();
+        }
+
+    }, delay);
+}
+
+
+/* =========================================
+   LAUNCH OBJECT C
+========================================= */
+
+function launchObjectC() {
+
+    if (score < 30) {
+
+        objectCActive = false;
+
+        scheduleObjectC();
+
+        return;
+    }
+
+    objectCX =
+        Math.random() *
+        Math.max(
+            1,
+            game.clientWidth - 80
+        );
+
+    objectCY = -100;
+
+    objectCSpeed =
+        4 +
+        Math.floor(score / 30) * 0.5;
+
+    objectCActive = true;
+
+    objectC.style.display =
+        "block";
+}
+
+
+/* =========================================
+   UPDATE OBJECT C
+========================================= */
+
+function updateObjectC() {
+
+    if (!objectCActive) {
+
+        return;
+    }
+
+    objectCY += objectCSpeed;
+
+    objectC.style.left =
+        objectCX + "px";
+
+    objectC.style.top =
+        objectCY + "px";
+
+    if (
+        objectCY >
+        game.clientHeight + 100
+    ) {
+
+        objectCActive = false;
+
+        objectC.style.display =
+            "none";
+
+        scheduleObjectC();
+    }
+}
+
+
+/* =========================================
+   OBJECT C COLLISION
+========================================= */
+
+function checkObjectCCollision() {
+
+    if (!objectCActive) {
+
+        return;
+    }
+
+    if (score < 30) {
+
+        return;
+    }
+
+    const characterRect =
+        characterWrapper.getBoundingClientRect();
+
+    const objectCRect =
+        objectC.getBoundingClientRect();
+
+    const collision =
+        characterRect.left <
+            objectCRect.right &&
+
+        characterRect.right >
+            objectCRect.left &&
+
+        characterRect.top <
+            objectCRect.bottom &&
+
+        characterRect.bottom >
+            objectCRect.top;
+
+    if (collision) {
+
+        score =
+            Math.max(
+                0,
+                score - 1
+            );
+
+        scoreDisplay.textContent =
+            score;
+
+        playHitSound();
+
+        updateLevelBar();
+
+        updateBackground();
+
+        objectCActive = false;
+
+        objectC.style.display =
+            "none";
+
+        scheduleObjectC();
+    }
+}
+
+
+/* =========================================
+   OBJECT B COLLISION
+========================================= */
+
+function checkCollision() {
+
+    if (eating) {
+
+        return;
+    }
+
+    const characterRect =
+        characterWrapper.getBoundingClientRect();
+
+    const bugRect =
+        objectB.getBoundingClientRect();
+
+    const collision =
+        characterRect.left <
+            bugRect.right &&
+
+        characterRect.right >
+            bugRect.left &&
+
+        characterRect.top <
+            bugRect.bottom &&
+
+        characterRect.bottom >
+            bugRect.top;
+
+    if (collision) {
+
+        score++;
+
+        scoreDisplay.textContent =
+            score;
+
+        playBlip();
+
+        updateLevelBar();
+
+        updateBackground();
+
+        if (score === 30) {
+
+            scheduleObjectC();
+        }
+
+        resetBug();
+
+        playEatAnimation();
+    }
+}
+
+
+/* =========================================
+   EAT
+========================================= */
+
+function playEatAnimation() {
+
+    eating = true;
+
+    setAnimation("eat");
+
+    setTimeout(function() {
+
+        eating = false;
+
+        updateMovementImage();
+
+    }, eatDuration);
+}
+
+
+/* =========================================
+   KEY DOWN
+========================================= */
+
+window.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.code === "ArrowLeft" ||
+            event.code === "ArrowRight" ||
+            event.code === "ArrowUp" ||
+            event.code === "ArrowDown" ||
+            event.code === "Space"
+        ) {
+
+            event.preventDefault();
+        }
+
+        if (event.repeat) {
+
+            return;
+        }
+
+
+        /* LEFT */
+
+        if (event.code === "ArrowLeft") {
+
+            leftPressed = true;
+
+            facingRight = false;
+
+            updateCharacterDirection();
+
+            updateMovementImage();
+        }
+
+
+        /* RIGHT */
+
+        if (event.code === "ArrowRight") {
+
+            rightPressed = true;
+
+            facingRight = true;
+
+            updateCharacterDirection();
+
+            updateMovementImage();
+        }
+
+
+        /* UP */
+
+        if (event.code === "ArrowUp") {
+
+            upPressed = true;
+
+            updateMovementImage();
+        }
+
+
+        /* DOWN */
+
+        if (event.code === "ArrowDown") {
+
+            downPressed = true;
+
+            updateMovementImage();
+        }
+
+
+        /* SHIFT */
+
+        if (
+            event.code === "ShiftLeft" ||
+            event.code === "ShiftRight"
+        ) {
+
+            shiftPressed = true;
+
+            updateMovementImage();
+        }
+
+
+        /* FLY */
+
+        if (event.code === "KeyF") {
+
+            flying = true;
+
+            setCharacterScale(1);
+
+            setAnimation("fly");
+        }
+
+
+        /* JUMP */
+
+        if (
+            event.code === "Space" &&
+            !jumping &&
+            !flying
+        ) {
+
+            jumping = true;
+
+            verticalVelocity =
+                jumpPower;
+
+            setAnimation("jump");
+        }
+
+    }
+);
+
+
+/* =========================================
+   KEY UP
+========================================= */
+
+window.addEventListener(
+    "keyup",
+    function(event) {
+
+        if (event.code === "ArrowLeft") {
+
+            leftPressed = false;
+        }
+
+        if (event.code === "ArrowRight") {
+
+            rightPressed = false;
+        }
+
+        if (event.code === "ArrowUp") {
+
+            upPressed = false;
+        }
+
+        if (event.code === "ArrowDown") {
+
+            downPressed = false;
+        }
+
+        if (
+            event.code === "ShiftLeft" ||
+            event.code === "ShiftRight"
+        ) {
+
+            shiftPressed = false;
+        }
+
+        if (event.code === "KeyF") {
+
+            flying = false;
+
+            updateDepthPosition();
+
+            updateMovementImage();
+        }
+
+        if (event.code === "Space") {
+
+            if (!jumping) {
+
+                updateMovementImage();
+            }
+
+            return;
+        }
+
+        updateMovementImage();
+
+    }
+);
+
+
+/* =========================================
+   MOBILE BUTTON HELPER
+========================================= */
+
+function setupTouchButton(
+    id,
+    pressFunction,
+    releaseFunction
+) {
+
+    const button =
+        document.getElementById(id);
+
+    if (!button) {
+
+        return;
+    }
+
+
+    function press(event) {
+
+        event.preventDefault();
+
+        button.classList.add("active");
+
+        pressFunction();
+    }
+
+
+    function release(event) {
+
+        event.preventDefault();
+
+        button.classList.remove("active");
+
+        releaseFunction();
+    }
+
+
+    button.addEventListener(
+        "pointerdown",
+        press
+    );
+
+
+    button.addEventListener(
+        "pointerup",
+        release
+    );
+
+
+    button.addEventListener(
+        "pointercancel",
+        release
+    );
+
+
+    button.addEventListener(
+        "pointerleave",
+        release
+    );
+
+}
+
+
+/* =========================================
+   MOBILE LEFT
+========================================= */
+
+setupTouchButton(
+
+    "btnLeft",
+
+    function() {
+
+        leftPressed = true;
+
+        facingRight = false;
+
+        updateCharacterDirection();
+
+        updateMovementImage();
+    },
+
+    function() {
+
+        leftPressed = false;
+
+        updateMovementImage();
+    }
+
+);
+
+
+/* =========================================
+   MOBILE RIGHT
+========================================= */
+
+setupTouchButton(
+
+    "btnRight",
+
+    function() {
+
+        rightPressed = true;
+
+        facingRight = true;
+
+        updateCharacterDirection();
+
+        updateMovementImage();
+    },
+
+    function() {
+
+        rightPressed = false;
+
+        updateMovementImage();
+    }
+
+);
+
+
+/* =========================================
+   MOBILE UP
+========================================= */
+
+setupTouchButton(
+
+    "btnUp",
+
+    function() {
+
+        upPressed = true;
+
+        updateMovementImage();
+    },
+
+    function() {
+
+        upPressed = false;
+
+        updateMovementImage();
+    }
+
+);
+
+
+/* =========================================
+   MOBILE DOWN
+========================================= */
+
+setupTouchButton(
+
+    "btnDown",
+
+    function() {
+
+        downPressed = true;
+
+        updateMovementImage();
+    },
+
+    function() {
+
+        downPressed = false;
+
+        updateMovementImage();
+    }
+
+);
+
+
+/* =========================================
+   MOBILE RUN
+========================================= */
+
+setupTouchButton(
+
+    "btnRun",
+
+    function() {
+
+        shiftPressed = true;
+
+        updateMovementImage();
+    },
+
+    function() {
+
+        shiftPressed = false;
+
+        updateMovementImage();
+    }
+
+);
+
+
+/* =========================================
+   MOBILE JUMP
+========================================= */
+
+setupTouchButton(
+
+    "btnJump",
+
+    function() {
+
+        if (
+            !jumping &&
+            !flying
+        ) {
+
+            jumping = true;
+
+            verticalVelocity =
+                jumpPower;
+
+            setAnimation("jump");
+        }
+
+    },
+
+    function() {
+
+        updateMovementImage();
+    }
+
+);
+
+
+/* =========================================
+   MOBILE FLY
+========================================= */
+
+setupTouchButton(
+
+    "btnFly",
+
+    function() {
+
+        flying = true;
+
+        setCharacterScale(1);
+
+        setAnimation("fly");
+    },
+
+    function() {
+
+        flying = false;
+
+        updateDepthPosition();
+
+        updateMovementImage();
+    }
+
+);
+
+
+/* =========================================
+   RELEASE BUTTONS WHEN TOUCH ENDS
+========================================= */
+
+document.addEventListener(
+    "pointerup",
+    function() {
+
+        /*
+         * This makes sure a movement button
+         * doesn't remain stuck if the user's
+         * finger leaves the button.
+         */
+
+        leftPressed = false;
+        rightPressed = false;
+        upPressed = false;
+        downPressed = false;
+        shiftPressed = false;
+
+        document
+            .querySelectorAll(".controlButton")
+            .forEach(function(button) {
+
+                button.classList.remove("active");
+
+            });
+
+        updateMovementImage();
+
+    }
+);
+
+
+/* =========================================
+   GAME LOOP
+========================================= */
+
+function gameLoop() {
+
+    /*
+     * FLYING
+     */
+
+    if (flying) {
+
+        moveFlying();
+
+    } else {
+
+        const speed =
+            shiftPressed
+                ? runSpeed
+                : walkSpeed;
+
+
+        if (leftPressed) {
+
+            x -= speed;
+        }
+
+
+        if (rightPressed) {
+
+            x += speed;
+        }
+
+
+        if (upPressed) {
+
+            moveBackground();
+        }
+
+
+        if (downPressed) {
+
+            moveForeground();
+        }
+
+
+        updateJump();
+
+        keepCharacterOnScreen();
+
+
+        characterWrapper.style.left =
+            x + "px";
+
+
+        updateDepthPosition();
+    }
+
+
+    /*
+     * BUG
+     */
+
+    updateBug();
+
+
+    /*
+     * DANGEROUS OBJECT
+     */
+
+    updateObjectC();
+
+
+    /*
+     * COLLISIONS
+     */
+
+    checkCollision();
+
+    checkObjectCCollision();
+
+
+    /*
+     * NEXT FRAME
+     */
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+
+/* =========================================
+   START GAME
+========================================= */
+
+setCharacterScale(1);
+
+updateCharacterDirection();
+
+updateLevelBar();
+
+resetBug();
+
+gameLoop();
+
+</script>
+
+</body>
+</html>
